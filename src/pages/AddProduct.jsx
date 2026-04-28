@@ -20,18 +20,36 @@ const AddProduct = () => {
     if (!navigator.onLine || !barcodeToLookup) return null;
     setIsLookingUp(true);
     let fetchedName = '';
+    
     try {
-      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcodeToLookup}.json`);
-      const data = await res.json();
-      if (data.status === 1 && data.product && data.product.product_name) {
-        fetchedName = data.product.product_name;
-        setProduct(p => ({ ...p, name: data.product.product_name }));
+      // API 1: OpenFoodFacts (Great for groceries)
+      const res1 = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcodeToLookup}.json`);
+      const data1 = await res1.json();
+      if (data1.status === 1 && data1.product && data1.product.product_name) {
+        fetchedName = data1.product.product_name;
       }
     } catch (e) {
-      console.error("Barcode lookup failed", e);
-    } finally {
-      setIsLookingUp(false);
+      console.error("OpenFoodFacts lookup failed", e);
     }
+
+    if (!fetchedName) {
+      try {
+        // API 2: UPCitemdb Trial (Great for general retail, electronics, etc.)
+        const res2 = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${barcodeToLookup}`);
+        const data2 = await res2.json();
+        if (data2.code === 'OK' && data2.items && data2.items.length > 0) {
+          fetchedName = data2.items[0].title;
+        }
+      } catch (e) {
+        console.error("UPCitemdb lookup failed", e);
+      }
+    }
+
+    if (fetchedName) {
+      setProduct(p => ({ ...p, name: fetchedName }));
+    }
+
+    setIsLookingUp(false);
     return fetchedName;
   };
 
