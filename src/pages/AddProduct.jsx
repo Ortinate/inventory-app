@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { addOrUpdateProduct, getProduct } from '../db';
 import Scanner from '../components/Scanner';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Shuffle } from 'lucide-react';
+import { Camera, Shuffle, Search, Loader2 } from 'lucide-react';
 
 const AddProduct = () => {
   const [product, setProduct] = useState({
@@ -13,15 +13,38 @@ const AddProduct = () => {
     stock: ''
   });
   const [showScanner, setShowScanner] = useState(false);
+  const [isLookingUp, setIsLookingUp] = useState(false);
   const navigate = useNavigate();
 
+  const lookupBarcode = async (barcodeToLookup) => {
+    if (!navigator.onLine || !barcodeToLookup) return null;
+    setIsLookingUp(true);
+    let fetchedName = '';
+    try {
+      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcodeToLookup}.json`);
+      const data = await res.json();
+      if (data.status === 1 && data.product && data.product.product_name) {
+        fetchedName = data.product.product_name;
+        setProduct(p => ({ ...p, name: data.product.product_name }));
+      }
+    } catch (e) {
+      console.error("Barcode lookup failed", e);
+    } finally {
+      setIsLookingUp(false);
+    }
+    return fetchedName;
+  };
+
   const handleScan = async (decodedText) => {
-    // Check if product already exists to populate fields for editing
+    // Check if product already exists locally
     const existing = await getProduct(decodedText);
     if (existing) {
       setProduct(existing);
     } else {
-      setProduct({ ...product, barcode: decodedText });
+      // If new, update state with barcode immediately
+      setProduct(p => ({ ...p, barcode: decodedText }));
+      // Attempt to look it up online automatically
+      await lookupBarcode(decodedText);
     }
     setShowScanner(false);
   };
@@ -32,7 +55,7 @@ const AddProduct = () => {
 
   const handleGenerateId = () => {
     const randomId = 'ITEM-' + Math.floor(100000 + Math.random() * 900000);
-    setProduct({ ...product, barcode: randomId });
+    setProduct({ ...product, barcode: randomId, name: '' });
   };
 
   const handleSubmit = async (e) => {
@@ -90,14 +113,27 @@ const AddProduct = () => {
               <Shuffle size={14} /> Generate Custom ID
             </button>
           </label>
-          <input 
-            type="text" 
-            name="barcode" 
-            value={product.barcode} 
-            onChange={handleChange} 
-            placeholder="Scan, type custom ID, or generate"
-            required 
-          />
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <input 
+              type="text" 
+              name="barcode" 
+              value={product.barcode} 
+              onChange={handleChange} 
+              placeholder="Scan, type custom ID, or generate"
+              required 
+              style={{ flex: 1 }}
+            />
+            <button 
+              type="button" 
+              onClick={() => lookupBarcode(product.barcode)}
+              className="btn-outline"
+              title="Look up barcode online"
+              style={{ width: 'auto', padding: '0 1rem' }}
+              disabled={isLookingUp || !product.barcode}
+            >
+              {isLookingUp ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
+            </button>
+          </div>
         </div>
         <div className="input-group">
           <label>Product Name</label>
@@ -146,6 +182,16 @@ const AddProduct = () => {
           Save Product
         </button>
       </form>
+
+      <style>{`
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };
