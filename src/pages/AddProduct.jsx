@@ -47,6 +47,8 @@ const AddProduct = () => {
 
     if (fetchedName) {
       setProduct(p => ({ ...p, name: fetchedName }));
+    } else if (barcodeToLookup) {
+      alert(`Could not find a product name for barcode ${barcodeToLookup} in public databases. You will need to type it manually.`);
     }
 
     setIsLookingUp(false);
