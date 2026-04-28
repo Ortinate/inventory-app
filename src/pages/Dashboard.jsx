@@ -52,11 +52,11 @@ const Dashboard = () => {
       <div className="stat-grid">
         <div className="stat-card">
           <span className="label">Total Revenue</span>
-          <span className="value" style={{ color: 'var(--brand-primary)' }}>${metrics.totalRevenue.toFixed(2)}</span>
+          <span className="value" style={{ color: 'var(--brand-primary)' }}>₵{metrics.totalRevenue.toFixed(2)}</span>
         </div>
         <div className="stat-card">
           <span className="label">Total Profit</span>
-          <span className="value" style={{ color: 'var(--brand-success)' }}>${metrics.totalProfit.toFixed(2)}</span>
+          <span className="value" style={{ color: 'var(--brand-success)' }}>₵{metrics.totalProfit.toFixed(2)}</span>
         </div>
         <div className="stat-card" style={{ gridColumn: 'span 2' }}>
           <span className="label">Items Sold</span>
@@ -78,8 +78,8 @@ const Dashboard = () => {
                 </p>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontWeight: '700', color: 'var(--brand-success)' }}>+${sale.sellPrice.toFixed(2)}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Profit: ${sale.profit.toFixed(2)}</p>
+                <p style={{ fontWeight: '700', color: 'var(--brand-success)' }}>+₵{sale.sellPrice.toFixed(2)}</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Profit: ₵{sale.profit.toFixed(2)}</p>
               </div>
             </div>
           ))}

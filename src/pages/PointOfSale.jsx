@@ -147,7 +147,7 @@ const PointOfSale = () => {
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Stock: {p.stock}</div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ fontWeight: '600' }}>${p.sellPrice.toFixed(2)}</span>
+                  <span style={{ fontWeight: '600' }}>₵{p.sellPrice.toFixed(2)}</span>
                   <PlusCircle size={18} color="var(--brand-primary)" />
                 </div>
               </div>
@@ -168,12 +168,12 @@ const PointOfSale = () => {
             {cart.map((item, idx) => (
               <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--border-color)' }}>
                 <span>{item.name}</span>
-                <span style={{ fontWeight: '600' }}>${item.sellPrice.toFixed(2)}</span>
+                <span style={{ fontWeight: '600' }}>₵{item.sellPrice.toFixed(2)}</span>
               </div>
             ))}
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0 0 0', fontWeight: '700', fontSize: '1.25rem' }}>
               <span>Total:</span>
-              <span>${total.toFixed(2)}</span>
+              <span>₵{total.toFixed(2)}</span>
             </div>
             <button className="btn-primary" style={{ marginTop: '1rem' }} onClick={handleCheckout}>
               Checkout

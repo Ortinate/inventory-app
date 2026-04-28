@@ -48,7 +48,7 @@ const Inventory = () => {
                 </p>
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', fontSize: '0.875rem' }}>
                   <span>Stock: <strong>{product.stock}</strong></span>
-                  <span>Price: <strong>${product.sellPrice.toFixed(2)}</strong></span>
+                  <span>Price: <strong>₵{product.sellPrice.toFixed(2)}</strong></span>
                 </div>
               </div>
               <button 

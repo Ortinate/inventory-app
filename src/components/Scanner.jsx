@@ -8,22 +8,12 @@ const Scanner = ({ onScan }) => {
   const scannerRef = useRef(null);
 
   useEffect(() => {
-    return () => {
-      // Cleanup on unmount
-      if (scannerRef.current) {
-        scannerRef.current.stop().catch(console.error);
-      }
-    };
-  }, []);
+    if (scanning) {
+      // The DOM has painted, so the #reader div exists now.
+      const html5QrCode = new Html5Qrcode("reader");
+      scannerRef.current = html5QrCode;
 
-  const startScanner = async () => {
-    setScanning(true);
-    setError('');
-    const html5QrCode = new Html5Qrcode("reader");
-    scannerRef.current = html5QrCode;
-
-    try {
-      await html5QrCode.start(
+      html5QrCode.start(
         { facingMode: "environment" },
         {
           fps: 10,
@@ -37,23 +27,34 @@ const Scanner = ({ onScan }) => {
           onScan(decodedText);
         },
         (errorMessage) => {
-          // Ignore general tracking errors as they just mean "not found yet"
+          // Ignore general tracking errors 
         }
-      );
-    } catch (err) {
-      setError('Could not start camera. Please check permissions.');
-      setScanning(false);
+      ).catch(err => {
+        console.error(err);
+        setError('Could not start camera. Please check permissions.');
+        setScanning(false);
+      });
     }
+
+    return () => {
+      // Cleanup on unmount or when scanning stops
+      if (scannerRef.current) {
+        try {
+          if (scannerRef.current.isScanning) {
+            scannerRef.current.stop().catch(console.error);
+          }
+        } catch(e) {}
+      }
+    };
+  }, [scanning, onScan]);
+
+  const startScanner = () => {
+    setError('');
+    setScanning(true);
   };
 
   const stopScanner = () => {
-    if (scannerRef.current) {
-      scannerRef.current.stop().then(() => {
-        setScanning(false);
-      }).catch(console.error);
-    } else {
-      setScanning(false);
-    }
+    setScanning(false);
   };
 
   return (
@@ -76,7 +77,8 @@ const Scanner = ({ onScan }) => {
               border: 'none', 
               borderRadius: '50%', 
               padding: '8px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              zIndex: 10
             }}
           >
             <X size={20} color="#0f172a" />

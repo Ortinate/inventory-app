@@ -112,7 +112,7 @@ const AddProduct = () => {
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <div className="input-group" style={{ flex: 1 }}>
-            <label>Cost Price ($)</label>
+            <label>Cost Price (₵)</label>
             <input 
               type="number" 
               step="0.01" 
@@ -122,7 +122,7 @@ const AddProduct = () => {
             />
           </div>
           <div className="input-group" style={{ flex: 1 }}>
-            <label>Sell Price ($)</label>
+            <label>Sell Price (₵)</label>
             <input 
               type="number" 
               step="0.01" 
